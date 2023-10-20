@@ -164,6 +164,23 @@ impl<T> IndexMut<Id> for Arena<T> {
         }
     }
 }
+impl<T, I> Index<I> for Arena<T>
+where
+    I: GenIndex<Item = T>,
+{
+    type Output = T;
+    fn index(&self, index: I) -> &Self::Output {
+        self.index(index.get_id())
+    }
+}
+impl<T, I> IndexMut<I> for Arena<T>
+where
+    I: GenIndex<Item = T>,
+{
+    fn index_mut(&mut self, index: I) -> &mut Self::Output {
+        self.index_mut(index.get_id())
+    }
+}
 
 #[derive(Clone, Debug)]
 struct Slot<T> {
@@ -201,6 +218,11 @@ impl Display for Id {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "Id({}, {})", self.index, self.generation)
     }
+}
+
+pub trait GenIndex {
+    type Item;
+    fn get_id(&self) -> Id;
 }
 
 #[derive(Clone, Debug)]
